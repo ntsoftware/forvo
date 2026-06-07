@@ -1,9 +1,6 @@
 from tkinter import Tk
 from tkinter.ttk import Button, Frame, Label
 
-def on_click():
-    label.config(text="Button clicked!")
-
 def run():
     root = Tk()
     root.title("Example application")
@@ -14,7 +11,7 @@ def run():
     label = Label(frame, text="Hello, World!")
     label.pack()
 
-    button = Button(frame, text="Click Me", command=on_click)
+    button = Button(frame, text="Click Me", command=lambda: label.config(text="Button clicked"))
     button.pack(pady=20)
 
     root.mainloop()
