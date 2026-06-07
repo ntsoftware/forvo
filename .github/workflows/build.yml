@@ -20,6 +20,9 @@ jobs:
           - os: windows-latest
             exe: dist/app.exe
 
+          - os: macos-latest
+            exe: dist/app
+
     runs-on: ${{ matrix.os }}
 
     steps:
