@@ -12,7 +12,7 @@ test:
 	pytest
 
 dist:
-	pyinstaller --onefile main.py
+	pyinstaller main.spec
 
 clean:
 	rm -rf build dist
