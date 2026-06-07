@@ -1,6 +1,7 @@
 from tkinter import Tk
 from tkinter.ttk import Button, Frame, Label
 
+
 def run():
     root = Tk()
     root.title("Example application")
@@ -15,4 +16,3 @@ def run():
     button.pack(pady=20)
 
     root.mainloop()
-
