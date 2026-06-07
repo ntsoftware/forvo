@@ -1,3 +1,5 @@
+flake8
 pyinstaller
 pylint
+pytest
 requests
