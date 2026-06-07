@@ -11,8 +11,16 @@ permissions:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            exe: dist/app
 
-    runs-on: ubuntu-latest
+          - os: windows-latest
+            exe: dist/app.exe
+
+    runs-on: ${{ matrix.os }}
 
     steps:
     - name: Checkout
@@ -41,5 +49,5 @@ jobs:
       uses: actions/upload-artifact@v7
       with:
         name: app
-        path: dist/app
+        path: ${{ matrix.exe }}
         archive: false
