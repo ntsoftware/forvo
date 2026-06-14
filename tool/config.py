@@ -30,6 +30,14 @@ class Config:
             self._cfg.read(user_path)
 
     @property
+    def wordlist_separator(self) -> str:
+        return self._cfg.get("wordlist", "separator")
+
+    @property
+    def wordlist_newline(self) -> str:
+        return self._cfg.get("wordlist", "newline")
+
+    @property
     def forvo_cache(self) -> Path:
         return Path(self._cfg.get("forvo", "cache")).expanduser().resolve()
 

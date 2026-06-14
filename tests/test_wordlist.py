@@ -1,24 +1,39 @@
 import logging
+from pathlib import Path
 
-from tool import WordList
+import pytest
+
+from tool import Config, WordList
+
+test_vectors = [
+    {
+        "input": "test-input/words1.txt",
+        "output": "test-output/words1.txt",
+    },
+    {
+        "input": "test-input/words2.txt",
+        "output": "test-output/words2.txt",
+    },
+    {
+        "input": "test-input/words3.txt",
+        "output": "test-output/words3.txt",
+    },
+]
 
 
-def test_words1():
-    wl = WordList("test-input/words1.txt")
+@pytest.fixture
+def cfg() -> Config:
+    return Config()
+
+
+@pytest.mark.parametrize("vector", test_vectors)
+def test_read_write(vector, cfg):
+    input_file = Path(vector["input"])
+    output_file = Path(vector["output"])
+
+    wl = WordList(input_file, cfg)
     for row in wl:
         logging.info(row)
-    wl.save("test-output/words1.txt")
+    wl.save(output_file)
 
-
-def test_words2():
-    wl = WordList("test-input/words2.txt")
-    for row in wl:
-        logging.info(row)
-    wl.save("test-output/words2.txt")
-
-
-def test_words3():
-    wl = WordList("test-input/words3.txt")
-    for row in wl:
-        logging.info(row)
-    wl.save("test-output/words3.txt")
+    assert input_file.read_bytes() == output_file.read_bytes()

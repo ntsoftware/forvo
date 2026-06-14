@@ -1,5 +1,8 @@
 import csv
 import logging
+from pathlib import Path
+
+from tool import Config
 
 
 def _parse_separator(value: str) -> str:
@@ -26,20 +29,27 @@ def _escape_str(value: str) -> str:
     return value
 
 
+def _unescape_str(value: str) -> str:
+    value = value.replace(r"\t", "\t")
+    value = value.replace(r"\r", "\r")
+    value = value.replace(r"\n", "\n")
+    return value
+
+
 class WordList:
-    def __init__(self, path: str) -> None:
+    def __init__(self, path: Path, cfg: Config) -> None:
         logging.debug(f"read word list {path}")
         with open(path, newline="", encoding="utf-8") as fp:
             lines = [line for line in fp]
 
             if fp.newlines is None:
-                self._newline = "\n"
+                self._newline = _unescape_str(cfg.wordlist_newline)
             elif isinstance(fp.newlines, str):
                 self._newline = fp.newlines
             else:
                 self._newline = fp.newlines[0]
 
-        self._separator = ","
+        self._separator = cfg.wordlist_separator
         self._columns = []
         self._headers = []
 
@@ -71,7 +81,7 @@ class WordList:
         self._rows = [row for row in reader]
         logging.debug(f"read {len(self._rows)} rows")
 
-    def save(self, path: str) -> None:
+    def save(self, path: Path) -> None:
         logging.debug(f"write word list {path}")
         with open(path, mode="w", newline="", encoding="utf-8") as fp:
             for line in self._headers:
