@@ -2,7 +2,8 @@ import logging
 import sys
 from configparser import ConfigParser
 from pathlib import Path
-from typing import List
+
+logger = logging.getLogger()
 
 
 def get_default_config_path() -> Path:
@@ -18,15 +19,15 @@ class Config:
     def __init__(self) -> None:
         default_path = get_default_config_path()
         user_path = get_user_config_path()
-        logging.debug(f"default config path: {default_path}")
-        logging.debug(f"user config path: {user_path}")
+        logger.debug("default config path: %s", default_path)
+        logger.debug("user config path: %s", user_path)
 
         self._cfg = ConfigParser()
         if default_path.exists():
-            logging.debug(f"read default config file {default_path}")
+            logger.debug("read default config file %s", default_path)
             self._cfg.read(default_path)
         if user_path.exists():
-            logging.debug(f"read user config file {user_path}")
+            logger.debug("read user config file %s", user_path)
             self._cfg.read(user_path)
 
     @property
@@ -42,11 +43,11 @@ class Config:
         return Path(self._cfg.get("forvo", "cache")).expanduser().resolve()
 
     @property
-    def forvo_preferred_users(self) -> List[str]:
+    def forvo_preferred_users(self) -> list[str]:
         return self._cfg.get("forvo", "preferred_users").split()
 
     @property
-    def forvo_preferred_countries(self) -> List[str]:
+    def forvo_preferred_countries(self) -> list[str]:
         return self._cfg.get("forvo", "preferred_countries").split()
 
     @property

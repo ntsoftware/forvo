@@ -5,6 +5,8 @@ import pytest
 
 from tool import Config, WordList
 
+logger = logging.getLogger()
+
 test_vectors = [
     {
         "input": "test-input/words1.txt",
@@ -27,13 +29,13 @@ def cfg() -> Config:
 
 
 @pytest.mark.parametrize("vector", test_vectors)
-def test_read_write(vector, cfg):
+def test_read_write(vector: dict, cfg: Config) -> None:
     input_file = Path(vector["input"])
     output_file = Path(vector["output"])
 
     wl = WordList(input_file, cfg)
     for row in wl:
-        logging.info(row)
+        logger.info(row)
     wl.save(output_file)
 
     assert input_file.read_bytes() == output_file.read_bytes()

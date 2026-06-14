@@ -1,46 +1,47 @@
 import csv
 import logging
+from collections.abc import Iterator
 from pathlib import Path
 
 from tool import Config
 
+logger = logging.getLogger()
+
 
 def _parse_separator(value: str) -> str:
-    if value == "comma":
-        return ","
-    elif value == "semicolon":
-        return ";"
-    elif value == "tab":
-        return "\t"
-    elif value == "space":
-        return " "
-    elif value == "pipe":
-        return "|"
-    elif value == "colon":
-        return ":"
-    else:
-        return value
+    delimiters = {
+        "comma": ",",
+        "semicolon": ";",
+        "tab": "\t",
+        "space": " ",
+        "pipe": "|",
+        "colon": ":",
+    }
+    return delimiters.get(value, value)
 
 
 def _escape_str(value: str) -> str:
-    value = value.replace("\t", r"\t")
-    value = value.replace("\r", r"\r")
-    value = value.replace("\n", r"\n")
-    return value
+    return value.replace("\t", r"\t").replace("\r", r"\r").replace("\n", r"\n")
 
 
 def _unescape_str(value: str) -> str:
-    value = value.replace(r"\t", "\t")
-    value = value.replace(r"\r", "\r")
-    value = value.replace(r"\n", "\n")
-    return value
+    return value.replace(r"\t", "\t").replace(r"\r", "\r").replace(r"\n", "\n")
+
+
+class Row:
+    def __init__(self, index: int, row: list[str]) -> None:
+        self._index = index
+        self._row = row
+
+    def __str__(self) -> str:
+        return f"{self._index}: {self._row}"
 
 
 class WordList:
     def __init__(self, path: Path, cfg: Config) -> None:
-        logging.debug(f"read word list {path}")
-        with open(path, newline="", encoding="utf-8") as fp:
-            lines = [line for line in fp]
+        logger.debug("read word list %s", path)
+        with path.open(newline="", encoding="utf-8") as fp:
+            lines = list(fp)
 
             if fp.newlines is None:
                 self._newline = _unescape_str(cfg.wordlist_newline)
@@ -67,31 +68,40 @@ class WordList:
                         col.strip() for col in value.split(self._separator)
                     ]
                 else:
-                    logging.warning(
-                        f"{path}:{lineno}: ignore header line '{line.strip()}'"
+                    logger.warning(
+                        "%s:%d: ignore header line '{line.strip()}'",
+                        path,
+                        lineno,
                     )
             except ValueError:
-                logging.error(f"{path}:{lineno}: cannot parse line '{line.strip()}'")
+                logger.exception(
+                    "%s:%d: cannot parse line '%s'",
+                    path,
+                    lineno,
+                    line.strip(),
+                )
 
-        logging.debug(f"separator: '{_escape_str(self._separator)}'")
-        logging.debug(f"newline: '{_escape_str(self._newline)}'")
-        logging.debug(f"columns: {self._columns}")
+        logger.debug("separator: '%s'", _escape_str(self._separator))
+        logger.debug("newline: '%s'", _escape_str(self._newline))
+        logger.debug("columns: %s", self._columns)
 
         reader = csv.reader(lines, delimiter=self._separator)
-        self._rows = [row for row in reader]
-        logging.debug(f"read {len(self._rows)} rows")
+        self._rows = list(reader)
+        logger.debug("read %d rows", len(self._rows))
 
     def save(self, path: Path) -> None:
-        logging.debug(f"write word list {path}")
-        with open(path, mode="w", newline="", encoding="utf-8") as fp:
-            for line in self._headers:
-                fp.write(line)
+        logger.debug("write word list %s", path)
+        with path.open(mode="w", newline="", encoding="utf-8") as fp:
+            fp.writelines(self._headers)
 
             writer = csv.writer(
-                fp, delimiter=self._separator, lineterminator=self._newline
+                fp,
+                delimiter=self._separator,
+                lineterminator=self._newline,
             )
             writer.writerows(self._rows)
-            logging.debug(f"wrote {len(self._rows)} rows")
+            logger.debug("wrote %d rows", len(self._rows))
 
-    def __iter__(self):
-        return iter(self._rows)
+    def __iter__(self) -> Iterator[Row]:
+        for i, row in enumerate(self._rows):
+            yield Row(i, row)
