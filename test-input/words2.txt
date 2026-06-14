@@ -1,0 +1,3 @@
+faire,する
+venir,くる
+maison,いえ
