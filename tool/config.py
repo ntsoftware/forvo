@@ -39,6 +39,14 @@ class Config:
         return self._cfg.get("wordlist", "newline")
 
     @property
+    def wordlist_ja_columns(self) -> list[str]:
+        return self._cfg.get("wordlist", "ja_columns").split()
+
+    @property
+    def wordlist_sound_columns(self) -> list[str]:
+        return self._cfg.get("wordlist", "sound_columns").split()
+
+    @property
     def forvo_cache(self) -> Path:
         return Path(self._cfg.get("forvo", "cache")).expanduser().resolve()
 

@@ -2,9 +2,10 @@
 
 import logging
 from argparse import ArgumentParser
+from pathlib import Path
 
 from tool import Config
-from tool.command import clear_cache, update_cache
+from tool.commands import clear_cache, get_queries, update_cache
 from tool.ui import run
 
 
@@ -35,6 +36,19 @@ def build_parser() -> ArgumentParser:
         parents=[common],
     )
     update_cache_parser.set_defaults(func=update_cache)
+
+    get_queries_parser = subparsers.add_parser(
+        "get-queries",
+        help="display forvo search candidates",
+        parents=[common],
+    )
+    get_queries_parser.add_argument(
+        "file",
+        metavar="FILE",
+        type=Path,
+        help="input word list",
+    )
+    get_queries_parser.set_defaults(func=get_queries)
 
     return parser
 

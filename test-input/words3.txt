@@ -1,5 +1,5 @@
 #separator:semicolon
-#columns:id;kana;ja;fr;tags
+#columns:id;kana;ja;fr;sound;tags
 MNN-0001;する;;faire;verbe
 MNN-0002;くる;;venir;verbe
 MNN-0003;いえ;家;maison
